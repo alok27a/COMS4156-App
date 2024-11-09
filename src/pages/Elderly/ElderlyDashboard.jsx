@@ -12,6 +12,7 @@ import {
     GridItem,
 } from "@chakra-ui/react";
 import Card from "../../components/Utility/Card";
+import Sidebar from "../../components/Elderly/ElderlySidebar";
 
 const Dashboard = () => {
     const toast = useToast();
@@ -68,68 +69,71 @@ const Dashboard = () => {
     );
 
     return (
-        <Stack p={4} gap={3}>
-            <Card>
-                <Stack gap={3}>
-                    <Heading>Welcome to Your Dashboard</Heading>
-                    <Text>Check out upcoming events below and RSVP!</Text>
-                    <Input
-                        placeholder="Search events..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        size="md"
-                        mb={4}
-                    />
-                </Stack>
-            </Card>
+        <Sidebar>
 
-            <Grid templateColumns="repeat(auto-fill, minmax(250px, 1fr))" gap={4}>
-                {filteredEvents.map((event) => (
-                    <GridItem key={event.id}>
-                        <Card
-                            p={4}
-                            borderWidth="1px"
-                            borderRadius="md"
-                            boxShadow="md"
-                            bg="teal.50"
-                            _hover={{ bg: "teal.100" }}
-                            h="300px" // Fixed height for uniform card size
-                            display="flex"
-                            flexDirection="column"
-                            justifyContent="space-between"
-                        >
-                            <Stack align="center" spacing={3} textAlign="center">
-                                <Image
-                                    src={event.photoUrl}
-                                    alt={event.name}
-                                    boxSize="150px"
-                                    objectFit="cover"
-                                    borderRadius="md"
-                                />
-                                <Box flex="1">
-                                    <Heading size="md" mb={2}>
-                                        {event.name}
-                                    </Heading>
-                                    <Text
-                                        overflowY="auto" // Allows scrolling for long text
-                                        maxHeight="60px" // Limits the height of the description
+            <Stack p={4} gap={3}>
+                <Card>
+                    <Stack gap={3}>
+                        <Heading>Welcome to Your Dashboard</Heading>
+                        <Text>Check out upcoming events below and RSVP!</Text>
+                        <Input
+                            placeholder="Search events..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            size="md"
+                            mb={4}
+                        />
+                    </Stack>
+                </Card>
+
+                <Grid templateColumns="repeat(auto-fill, minmax(250px, 1fr))" gap={4}>
+                    {filteredEvents.map((event) => (
+                        <GridItem key={event.id}>
+                            <Card
+                                p={4}
+                                borderWidth="1px"
+                                borderRadius="md"
+                                boxShadow="md"
+                                bg="teal.50"
+                                _hover={{ bg: "teal.100" }}
+                                h="300px" // Fixed height for uniform card size
+                                display="flex"
+                                flexDirection="column"
+                                justifyContent="space-between"
+                            >
+                                <Stack align="center" spacing={3} textAlign="center">
+                                    <Image
+                                        src={event.photoUrl}
+                                        alt={event.name}
+                                        boxSize="150px"
+                                        objectFit="cover"
+                                        borderRadius="md"
+                                    />
+                                    <Box flex="1">
+                                        <Heading size="md" mb={2}>
+                                            {event.name}
+                                        </Heading>
+                                        <Text
+                                            overflowY="auto" // Allows scrolling for long text
+                                            maxHeight="60px" // Limits the height of the description
+                                        >
+                                            {event.description}
+                                        </Text>
+                                    </Box>
+                                    <Button
+                                        colorScheme="blue"
+                                        mt={2}
+                                        onClick={() => handleRSVP(event.id)}
                                     >
-                                        {event.description}
-                                    </Text>
-                                </Box>
-                                <Button
-                                    colorScheme="blue"
-                                    mt={2}
-                                    onClick={() => handleRSVP(event.id)}
-                                >
-                                    RSVP
-                                </Button>
-                            </Stack>
-                        </Card>
-                    </GridItem>
-                ))}
-            </Grid>
-        </Stack>
+                                        RSVP
+                                    </Button>
+                                </Stack>
+                            </Card>
+                        </GridItem>
+                    ))}
+                </Grid>
+            </Stack>
+        </Sidebar>
     );
 };
 

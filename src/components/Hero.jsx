@@ -140,7 +140,7 @@ const Hero = () => {
           <Stack justifyContent="center" gap={8}>
             <Box maxW="50ch">
               <Heading fontSize={{ base: "3xl", md: "4xl", lg: "5xl" }}>
-                EventEase Platform for Event Management
+                A Platform for Event Management
               </Heading>
             </Box>
             <Stack direction="row" gap={8}>
