@@ -18,13 +18,11 @@ import { useParams } from "react-router-dom";
 
 const Dashboard = () => {
   const { userId } = useParams();
-
   const toast = useToast();
   const [events, setEvents] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [location, setLocation] = useState("");
 
-  // Fetch events from API
   useEffect(() => {
     const fetchEvents = async () => {
       try {
@@ -36,18 +34,7 @@ const Dashboard = () => {
         }
         const data = await response.json();
         if (data.success) {
-          setEvents(
-            data.data.map((event) => ({
-              id: event.id,
-              name: event.name,
-              description: event.description,
-              location: event.location,
-              date: event.date,
-              time: event.time || "TBA",
-              host: `${event.host.firstName} ${event.host.lastName}`,
-              photoUrl: "https://via.placeholder.com/150", // Placeholder for event images
-            }))
-          );
+          setEvents(data.data);
         } else {
           throw new Error("Failed to load events.");
         }
@@ -68,7 +55,7 @@ const Dashboard = () => {
   const handleRSVP = async (eventId) => {
     try {
       const response = await fetch(
-        `https://cors-anywhere.herokuapp.com/https://eventease-439518.ue.r.appspot.com/api/events/${eventId}/rsvp/${userId}`,
+        `https://eventease-439518.ue.r.appspot.com/api/events/${eventId}/rsvp/${userId}`,
         {
           method: "POST",
           headers: {
@@ -84,8 +71,6 @@ const Dashboard = () => {
       );
 
       const data = await response.json();
-      console.log(data);
-
       if (data.success) {
         toast({
           title: "RSVP Successful",
@@ -95,18 +80,12 @@ const Dashboard = () => {
           isClosable: true,
         });
       } else {
-        toast({
-          title: "RSVP Failed",
-          description: data.message || "An unexpected error occurred.",
-          status: "error",
-          duration: 5000,
-          isClosable: true,
-        });
+        throw new Error(data.message || "An unexpected error occurred.");
       }
     } catch (error) {
       toast({
-        title: "Error",
-        description: "An unexpected error occurred while RSVPing.",
+        title: "RSVP Failed",
+        description: error.message,
         status: "error",
         duration: 5000,
         isClosable: true,
@@ -131,16 +110,12 @@ const Dashboard = () => {
           <Stack gap={3}>
             <Heading>Welcome to Your Dashboard</Heading>
             <Text>Check out upcoming events below and RSVP!</Text>
-
-            {/* Search Input */}
             <Input
               placeholder="Search events by name..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               size="md"
             />
-
-            {/* Filter Options */}
             <Flex gap={4} mt={4}>
               <Input
                 placeholder="Filter by location..."
@@ -151,7 +126,6 @@ const Dashboard = () => {
           </Stack>
         </Card>
 
-        {/* Event Cards */}
         <Grid templateColumns="repeat(auto-fill, minmax(250px, 1fr))" gap={4}>
           {filteredEvents.map((event) => (
             <GridItem key={event.id}>
@@ -165,21 +139,19 @@ const Dashboard = () => {
                 display="flex"
                 flexDirection="column"
                 justifyContent="space-between"
-                minHeight="350px" // Min height to keep cards uniform, but allows expanding if needed
-                overflow="hidden" // Prevent overflow of card content
+                minHeight="350px"
+                overflow="hidden"
               >
                 <Stack align="center" spacing={3} textAlign="center" flex="1">
-                  {/* Image section */}
                   <Image
-                    src={event.photoUrl}
+                    src={event.images && event.images.length > 0 ? event.images[0].url : 'https://via.placeholder.com/150'}
                     alt={event.name}
                     boxSize="150px"
                     objectFit="cover"
                     borderRadius="md"
-                    mb={3} // Adds space between image and content
+                    mb={3}
+                    fallbackSrc="https://via.placeholder.com/150"
                   />
-
-                  {/* Event details */}
                   <Box
                     flex="1"
                     display="flex"
@@ -189,18 +161,14 @@ const Dashboard = () => {
                     <Heading size="md" mb={2}>
                       {event.name}
                     </Heading>
-
-                    {/* Description with wrapping */}
                     <Text
                       fontSize="sm"
                       color="gray.500"
                       mb={2}
-                      whiteSpace="normal" // Allows the description to wrap to the next line
+                      whiteSpace="normal"
                     >
                       {event.description}
                     </Text>
-
-                    {/* Other details */}
                     <Text fontSize="sm" color="gray.500">
                       Location: {event.location}
                     </Text>
@@ -208,19 +176,17 @@ const Dashboard = () => {
                       Date: {event.date}
                     </Text>
                     <Text fontSize="sm" color="gray.500">
-                      Time: {event.time}
+                      Time: {event.time || "TBA"}
                     </Text>
                     <Text fontSize="sm" color="gray.500">
-                      Host: {event.host}
+                      Host: {`${event.host.firstName} ${event.host.lastName}`}
                     </Text>
                   </Box>
-
-                  {/* RSVP Button */}
                   <Button
                     colorScheme="blue"
                     mt={2}
                     onClick={() => handleRSVP(event.id)}
-                    w="full" // Makes the button span full width
+                    w="full"
                   >
                     RSVP
                   </Button>
