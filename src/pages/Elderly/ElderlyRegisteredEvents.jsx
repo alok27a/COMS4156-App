@@ -3,12 +3,11 @@ import {
     Stack,
     Heading,
     Text,
-    Button,
-    Image,
     Box,
     useToast,
     Grid,
     GridItem,
+    Badge,
 } from "@chakra-ui/react";
 import Card from "../../components/Utility/Card";
 import Sidebar from "../../components/Elderly/ElderlySidebar";
@@ -19,34 +18,39 @@ const ElderlyRegisteredEvents = () => {
     const toast = useToast();
     const [registeredEvents, setRegisteredEvents] = useState([]);
 
-    // Simulate an API call to fetch registered events
+    // Fetch registered events
     useEffect(() => {
         const fetchRegisteredEvents = async () => {
             try {
-                // Replace this with a real API call
-                const response = await new Promise((resolve) =>
-                    setTimeout(() => {
-                        resolve([
-                            {
-                                id: 101,
-                                name: "Healthy Cooking Class",
-                                description: "Learn to prepare nutritious meals.",
-                                photoUrl: "https://via.placeholder.com/150",
-                            },
-                            {
-                                id: 102,
-                                name: "Senior Zumba",
-                                description: "Dance and stay fit with a fun Zumba session.",
-                                photoUrl: "https://via.placeholder.com/150",
-                            },
-                        ]);
-                    }, 1000)
+                const response = await fetch(
+                    `https://eventease-439518.ue.r.appspot.com/api/events/rsvp/user/${userId}`
                 );
-                setRegisteredEvents(response);
+
+                if (!response.ok) {
+                    throw new Error("Failed to fetch registered events.");
+                }
+
+                const data = await response.json();
+
+                if (data.success && data.data) {
+                    // Extract events and status from the API response
+                    const events = data.data.map((item) => ({
+                        id: item.event.id,
+                        name: item.event.name,
+                        description: item.event.description,
+                        location: item.event.location,
+                        date: item.event.date,
+                        time: item.event.time,
+                        status: item.status, // Add status to each event
+                    }));
+                    setRegisteredEvents(events);
+                } else {
+                    throw new Error("Invalid response from server.");
+                }
             } catch (error) {
                 toast({
                     title: "Error Fetching Events",
-                    description: "Unable to load registered events.",
+                    description: error.message,
                     status: "error",
                     duration: 5000,
                     isClosable: true,
@@ -55,7 +59,21 @@ const ElderlyRegisteredEvents = () => {
         };
 
         fetchRegisteredEvents();
-    }, [toast]);
+    }, [userId, toast]);
+
+    // Function to get color based on status
+    const getStatusColor = (status) => {
+        switch (status) {
+            case "CONFIRMED":
+                return "green";
+            case "PENDING":
+                return "yellow";
+            case "CANCELLED":
+                return "red";
+            default:
+                return "gray";
+        }
+    };
 
     return (
         <Sidebar userId={userId}>
@@ -83,24 +101,22 @@ const ElderlyRegisteredEvents = () => {
                                     flexDirection="column"
                                     justifyContent="space-between"
                                 >
-                                    <Stack align="center" spacing={3} textAlign="center">
-                                        <Image
-                                            src={event.photoUrl}
-                                            alt={event.name}
-                                            boxSize="150px"
-                                            objectFit="cover"
-                                            borderRadius="md"
-                                        />
-                                        <Box flex="1">
-                                            <Heading size="md" mb={2}>
-                                                {event.name}
-                                            </Heading>
-                                            <Text
-                                                overflowY="auto" // Allows scrolling for long text
-                                                maxHeight="60px" // Limits the height of the description
-                                            >
-                                                {event.description}
-                                            </Text>
+                                    <Stack spacing={3}>
+                                        <Heading size="md">{event.name}</Heading>
+                                        <Text>{event.description}</Text>
+                                        <Text fontSize="sm" color="gray.500">
+                                            Location: {event.location}
+                                        </Text>
+                                        <Text fontSize="sm" color="gray.500">
+                                            Date: {event.date}
+                                        </Text>
+                                        <Text fontSize="sm" color="gray.500">
+                                            Time: {event.time}
+                                        </Text>
+                                        <Box>
+                                            <Badge colorScheme={getStatusColor(event.status)}>
+                                                {event.status}
+                                            </Badge>
                                         </Box>
                                     </Stack>
                                 </Card>
