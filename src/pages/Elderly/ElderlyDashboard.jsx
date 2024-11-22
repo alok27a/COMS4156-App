@@ -13,8 +13,11 @@ import {
 } from "@chakra-ui/react";
 import Card from "../../components/Utility/Card";
 import Sidebar from "../../components/Elderly/ElderlySidebar";
+import { useParams } from "react-router-dom";
 
 const Dashboard = () => {
+    const { userId } = useParams();
+
     const toast = useToast();
     const [events, setEvents] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
@@ -69,7 +72,7 @@ const Dashboard = () => {
     );
 
     return (
-        <Sidebar>
+        <Sidebar userId={userId}>
 
             <Stack p={4} gap={3}>
                 <Card>
