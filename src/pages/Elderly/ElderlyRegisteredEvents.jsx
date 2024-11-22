@@ -8,6 +8,7 @@ import {
     Grid,
     GridItem,
     Badge,
+    Button,
 } from "@chakra-ui/react";
 import Card from "../../components/Utility/Card";
 import Sidebar from "../../components/Elderly/ElderlySidebar";
@@ -61,6 +62,51 @@ const ElderlyRegisteredEvents = () => {
         fetchRegisteredEvents();
     }, [userId, toast]);
 
+    // Function to cancel RSVP
+    const handleCancelRSVP = async (eventId) => {
+        try {
+            const response = await fetch(
+                `https://cors-anywhere.herokuapp.com/https://eventease-439518.ue.r.appspot.com/api/events/${eventId}/rsvp/cancel/${userId}`,
+                {
+                    method: "DELETE",
+                }
+            );
+
+            const data = await response.json();
+
+            if (data.success) {
+                toast({
+                    title: "RSVP Cancelled",
+                    description: "You have successfully cancelled your RSVP.",
+                    status: "success",
+                    duration: 5000,
+                    isClosable: true,
+                });
+
+                // Update the registered events list
+                setRegisteredEvents((prevEvents) =>
+                    prevEvents.filter((event) => event.id !== eventId)
+                );
+            } else {
+                toast({
+                    title: "Error",
+                    description: data.message || "Failed to cancel RSVP.",
+                    status: "error",
+                    duration: 5000,
+                    isClosable: true,
+                });
+            }
+        } catch (error) {
+            toast({
+                title: "Error",
+                description: "An unexpected error occurred while cancelling RSVP.",
+                status: "error",
+                duration: 5000,
+                isClosable: true,
+            });
+        }
+    };
+
     // Function to get color based on status
     const getStatusColor = (status) => {
         switch (status) {
@@ -96,7 +142,7 @@ const ElderlyRegisteredEvents = () => {
                                     boxShadow="md"
                                     bg="blue.50"
                                     _hover={{ bg: "blue.100" }}
-                                    h="300px" // Fixed height for uniform card size
+                                    h="350px" // Adjusted height for uniform card size
                                     display="flex"
                                     flexDirection="column"
                                     justifyContent="space-between"
@@ -119,6 +165,13 @@ const ElderlyRegisteredEvents = () => {
                                             </Badge>
                                         </Box>
                                     </Stack>
+                                    <Button
+                                        colorScheme="red"
+                                        mt={2}
+                                        onClick={() => handleCancelRSVP(event.id)}
+                                    >
+                                        Cancel RSVP
+                                    </Button>
                                 </Card>
                             </GridItem>
                         ))}
