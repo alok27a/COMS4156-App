@@ -37,6 +37,7 @@ const CaregiverRegisteredEvents = () => {
   const [registeredEvents, setRegisteredEvents] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [attendees, setAttendees] = useState([]);
+  const [tasks, setTasks] = useState([]);
   const [isAttendeeModalOpen, setAttendeeModalOpen] = useState(false);
   const [isEditModalOpen, setEditModalOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
@@ -75,17 +76,31 @@ const CaregiverRegisteredEvents = () => {
 
   const handleViewDetails = async (eventId) => {
     try {
-      const response = await fetch(
+      // Fetch attendees
+      const attendeesResponse = await fetch(
         `https://eventease-439518.ue.r.appspot.com/api/events/${eventId}/attendees`
       );
-      const data = await response.json();
+      const attendeesData = await attendeesResponse.json();
 
-      if (response.ok && data.data) {
-        setAttendees(data.data);
-        setAttendeeModalOpen(true);
+      // Fetch tasks
+      const tasksResponse = await fetch(
+        `https://eventease-439518.ue.r.appspot.com/api/tasks/event/${eventId}`
+      );
+      const tasksData = await tasksResponse.json();
+
+      if (attendeesResponse.ok && attendeesData.data) {
+        setAttendees(attendeesData.data);
       } else {
-        throw new Error(data.message || "Failed to fetch attendees.");
+        throw new Error(attendeesData.message || "Failed to fetch attendees.");
       }
+
+      if (tasksResponse.ok && tasksData.data) {
+        setTasks(tasksData.data);
+      } else {
+        throw new Error(tasksData.message || "Failed to fetch tasks.");
+      }
+
+      setAttendeeModalOpen(true);
     } catch (error) {
       toast({
         title: "Error",
@@ -185,6 +200,37 @@ const CaregiverRegisteredEvents = () => {
     }
   };
 
+
+  const handleAssignTasks = async (eventId) => {
+    try {
+      const response = await fetch(
+        `https://cors-anywhere.herokuapp.com/https://eventease-439518.ue.r.appspot.com/api/tasks?eventId=${eventId}&userId=${userId}`,
+        { method: "POST" }
+      );
+
+      if (response.ok) {
+        toast({
+          title: "Tasks Assigned",
+          description: "Tasks were successfully assigned.",
+          status: "success",
+          duration: 5000,
+          isClosable: true,
+        });
+      } else {
+        throw new Error("Failed to assign tasks.");
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error.message,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+  
+  };
+
   const filteredEvents = registeredEvents.filter((event) =>
     event.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -269,6 +315,20 @@ const CaregiverRegisteredEvents = () => {
                         >
                           View Details
                         </Button>
+                        <Button
+                          colorScheme="green"
+                          onClick={() => handleAssignTasks(event.id)}
+                        >
+                          Assign Tasks
+                        </Button>
+
+                        <Button
+                          colorScheme="blue"
+                          onClick={() => handleViewDetails(event.id)}
+                        >
+                          RSVP a User
+                        </Button>
+
                       </Stack>
                     </Stack>
                   </Card>
@@ -334,9 +394,12 @@ const CaregiverRegisteredEvents = () => {
       >
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Attendees</ModalHeader>
+          <ModalHeader>Event Details</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
+            <Heading size="md" mb={4}>
+              Attendees
+            </Heading>
             <Table variant="simple">
               <Thead>
                 <Tr>
@@ -353,6 +416,30 @@ const CaregiverRegisteredEvents = () => {
                       {attendee.user.firstName} {attendee.user.lastName}
                     </Td>
                     <Td>{attendee.status}</Td>
+                  </Tr>
+                ))}
+              </Tbody>
+            </Table>
+
+            <Heading size="md" mt={6} mb={4}>
+              Assigned Tasks
+            </Heading>
+            <Table variant="simple">
+              <Thead>
+                <Tr>
+                  <Th>Task ID</Th>
+                  <Th>Task Name</Th>
+                  <Th>Assigned To</Th>
+                  <Th>Status</Th>
+                </Tr>
+              </Thead>
+              <Tbody>
+                {tasks.map((task) => (
+                  <Tr key={task.id}>
+                    <Td>{task.id}</Td>
+                    <Td>{task.name}</Td>
+                    <Td>{task.userID.id}</Td>
+                    <Td>{task.status}</Td>
                   </Tr>
                 ))}
               </Tbody>
@@ -412,6 +499,7 @@ const CaregiverRegisteredEvents = () => {
           </ModalFooter>
         </ModalContent>
       </Modal>
+    
     </Sidebar>
   );
 };

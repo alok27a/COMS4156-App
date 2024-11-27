@@ -55,7 +55,7 @@ const Dashboard = () => {
   const handleRSVP = async (eventId) => {
     try {
       const response = await fetch(
-        `https://eventease-439518.ue.r.appspot.com/api/events/${eventId}/rsvp/${userId}`,
+        `https://cors-anywhere.herokuapp.com/https://eventease-439518.ue.r.appspot.com/api/events/${eventId}/rsvp/${userId}`,
         {
           method: "POST",
           headers: {

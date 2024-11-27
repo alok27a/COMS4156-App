@@ -13,27 +13,59 @@ import {
 } from "@chakra-ui/react";
 import Card from "../../components/Utility/Card";
 import Sidebar from "../../components/Caregiver/CaregiverSidebar";
+import axios from "axios"; // Ensure axios is installed
 
 const CaregiverAssignedTasks = () => {
     const toast = useToast();
     const [tasks, setTasks] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
+    const userId = 1; // Replace with dynamic user ID if needed
 
-    // Fetch assigned tasks (dummy data for now)
+    // Fetch assigned tasks from API
     useEffect(() => {
-        const dummyTasks = [
-            { id: 1, title: "Grocery Shopping", description: "Buy groceries for Mrs. Smith.", status: "Pending" },
-            { id: 2, title: "Medication Reminder", description: "Remind Mr. Brown to take his medicine at 8 PM.", status: "Completed" },
-            { id: 3, title: "Laundry Assistance", description: "Help Ms. Green with her laundry.", status: "Pending" },
-        ];
-        setTasks(dummyTasks);
-    }, []);
+        const fetchTasks = async () => {
+            try {
+                const response = await axios.get(
+                    `https://eventease-439518.ue.r.appspot.com/api/tasks/user/${userId}`
+                );
+                if (response.data && response.data.success) {
+                    // Transform API data into the required format
+                    const transformedTasks = response.data.data.map((task) => ({
+                        id: task.id,
+                        title: task.name,
+                        description: task.description,
+                        status: task.status,
+                    }));
+                    setTasks(transformedTasks);
+                } else {
+                    toast({
+                        title: "Error",
+                        description: "Failed to fetch tasks.",
+                        status: "error",
+                        duration: 5000,
+                        isClosable: true,
+                    });
+                }
+            } catch (error) {
+                console.error("Error fetching tasks:", error);
+                toast({
+                    title: "Error",
+                    description: "Unable to fetch tasks. Please try again later.",
+                    status: "error",
+                    duration: 5000,
+                    isClosable: true,
+                });
+            }
+        };
+
+        fetchTasks();
+    }, [userId, toast]);
 
     // Mark task as completed
     const handleMarkAsCompleted = (taskId) => {
         setTasks(
             tasks.map((task) =>
-                task.id === taskId ? { ...task, status: "Completed" } : task
+                task.id === taskId ? { ...task, status: "COMPLETED" } : task
             )
         );
         toast({
@@ -75,9 +107,9 @@ const CaregiverAssignedTasks = () => {
                                 borderWidth="1px"
                                 borderRadius="md"
                                 boxShadow="md"
-                                bg={task.status === "Completed" ? "green.50" : "yellow.50"}
+                                bg={task.status === "COMPLETED" ? "green.50" : "yellow.50"}
                                 _hover={{
-                                    bg: task.status === "Completed" ? "green.100" : "yellow.100",
+                                    bg: task.status === "COMPLETED" ? "green.100" : "yellow.100",
                                 }}
                                 h="200px"
                                 display="flex"
@@ -91,13 +123,13 @@ const CaregiverAssignedTasks = () => {
                                     </Box>
                                     <Badge
                                         colorScheme={
-                                            task.status === "Completed" ? "green" : "orange"
+                                            task.status === "COMPLETED" ? "green" : "orange"
                                         }
                                     >
                                         {task.status}
                                     </Badge>
                                 </Stack>
-                                {task.status === "Pending" && (
+                                {task.status !== "COMPLETED" && (
                                     <Button
                                         colorScheme="blue"
                                         mt={4}

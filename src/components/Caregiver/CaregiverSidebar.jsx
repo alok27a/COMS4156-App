@@ -24,7 +24,7 @@ const SidebarContent = ({ onClose, ...rest }) => {
     { name: "Home", icon: FaHome, path: `/caregiver/${userId}/dashboard` },
     { name: "Manage Events", icon:FaBookReader , path: `/caregiver/${userId}/dashboard/registeredevents` },
     { name: "Tasks Assigned", icon:FaTasks , path: `/caregiver/${userId}/dashboard/taskassigned` },
-    { name: "History", icon: FaHistory, path: `/caregiver/${userId}/dashboard/history` },
+    // { name: "History", icon: FaHistory, path: `/caregiver/${userId}/dashboard/history` },
   ];
 
   return (

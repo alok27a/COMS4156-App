@@ -23,7 +23,7 @@ const SidebarContent = ({ onClose, ...rest }) => {
   const LinkItems = [
     { name: "Home", icon: FaHome, path: `/elderly/${userId}/dashboard` },
     { name: "Registered Events", icon: FaBookReader, path: `/elderly/${userId}/dashboard/registeredevents` },
-    { name: "History", icon: FaHistory, path: `/elderly/${userId}/dashboard/history` },
+    // { name: "History", icon: FaHistory, path: `/elderly/${userId}/dashboard/history` },
   ];
 
   return (
