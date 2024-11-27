@@ -200,7 +200,6 @@ const CaregiverRegisteredEvents = () => {
     }
   };
 
-
   const handleAssignTasks = async (eventId) => {
     try {
       const response = await fetch(
@@ -228,8 +227,73 @@ const CaregiverRegisteredEvents = () => {
         isClosable: true,
       });
     }
-  
   };
+
+  // RSVP a user button
+  const [isRSVPModalOpen, setRSVPModalOpen] = useState(false);
+  const [rsvpMethod, setRsvpMethod] = useState(""); // "SMS" or "Email"
+  const [rsvpData, setRsvpData] = useState({
+    userId: "",
+    message: "",
+    subject: "",
+  });
+  const [currentEventId, setCurrentEventId] = useState(null); // To store eventId
+  
+  const handleRSVPUser = (eventId) => {
+    setCurrentEventId(eventId); // Set the eventId
+    setRSVPModalOpen(true);
+  };
+  
+  const handleRSVPSubmit = async () => {
+    try {
+      const url =
+        rsvpMethod === "SMS"
+          ? "https://cors-anywhere.herokuapp.com/https://eventease-439518.ue.r.appspot.com/api/send-message"
+          : "https://cors-anywhere.herokuapp.com/https://eventease-439518.ue.r.appspot.com/api/send-email";
+  
+      const payload =
+        rsvpMethod === "SMS"
+          ? { eventId: currentEventId.toString(), userId: rsvpData.userId, message: rsvpData.message }
+          : {
+              eventId: currentEventId.toString(),
+              userId: rsvpData.userId,
+              subject: rsvpData.subject,
+              message: rsvpData.message,
+            };
+  
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+  
+      if (response.ok) {
+        toast({
+          title: "RSVP Sent",
+          description: `RSVP sent successfully via ${rsvpMethod}.`,
+          status: "success",
+          duration: 5000,
+          isClosable: true,
+        });
+        setRSVPModalOpen(false);
+        setRsvpData({ userId: "", message: "", subject: "" });
+        setCurrentEventId(null); // Clear eventId after use
+      } else {
+        throw new Error("Failed to send RSVP.");
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error.message,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+  };
+  
 
   const filteredEvents = registeredEvents.filter((event) =>
     event.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -324,11 +388,10 @@ const CaregiverRegisteredEvents = () => {
 
                         <Button
                           colorScheme="blue"
-                          onClick={() => handleViewDetails(event.id)}
+                          onClick={() => handleRSVPUser(event.id)}
                         >
                           RSVP a User
                         </Button>
-
                       </Stack>
                     </Stack>
                   </Card>
@@ -499,7 +562,95 @@ const CaregiverRegisteredEvents = () => {
           </ModalFooter>
         </ModalContent>
       </Modal>
-    
+
+      <Modal isOpen={isRSVPModalOpen} onClose={() => setRSVPModalOpen(false)}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Send RSVP</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            {!rsvpMethod ? (
+              <Stack spacing={4}>
+                <Button colorScheme="blue" onClick={() => setRsvpMethod("SMS")}>
+                  Send via SMS
+                </Button>
+                <Button
+                  colorScheme="teal"
+                  onClick={() => setRsvpMethod("Email")}
+                >
+                  Send via Email
+                </Button>
+              </Stack>
+            ) : (
+              <Stack spacing={4}>
+                <FormControl>
+                  <FormLabel>User ID</FormLabel>
+                  <Input
+                    placeholder="Enter User ID"
+                    value={rsvpData.userId}
+                    onChange={(e) =>
+                      setRsvpData((prev) => ({
+                        ...prev,
+                        userId: e.target.value,
+                      }))
+                    }
+                  />
+                </FormControl>
+                {rsvpMethod === "Email" && (
+                  <FormControl>
+                    <FormLabel>Subject</FormLabel>
+                    <Input
+                      placeholder="Enter Subject"
+                      value={rsvpData.subject}
+                      onChange={(e) =>
+                        setRsvpData((prev) => ({
+                          ...prev,
+                          subject: e.target.value,
+                        }))
+                      }
+                    />
+                  </FormControl>
+                )}
+                <FormControl>
+                  <FormLabel>Message</FormLabel>
+                  <Textarea
+                    placeholder="Enter Message"
+                    value={rsvpData.message}
+                    onChange={(e) =>
+                      setRsvpData((prev) => ({
+                        ...prev,
+                        message: e.target.value,
+                      }))
+                    }
+                  />
+                </FormControl>
+              </Stack>
+            )}
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              colorScheme="blue"
+              onClick={handleRSVPSubmit}
+              isDisabled={
+                !rsvpData.userId ||
+                !rsvpData.message ||
+                (rsvpMethod === "Email" && !rsvpData.subject)
+              }
+            >
+              Send RSVP
+            </Button>
+            <Button
+              variant="ghost"
+              onClick={() => {
+                setRsvpMethod("");
+                setRSVPModalOpen(false);
+              }}
+            >
+              Cancel
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </Sidebar>
   );
 };
