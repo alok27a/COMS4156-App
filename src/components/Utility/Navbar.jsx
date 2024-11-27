@@ -86,7 +86,7 @@ const Navbar = () => {
   const handleClick1 = () => setShow1(!show1)
 
   const signinClicked = async () => {
-    if (password.length == 0 || email.length == 0) {
+    if (password.length === 0 || email.length === 0) {
       toast({
         title: 'Error!',
         description: "No value Entered",
@@ -98,7 +98,7 @@ const Navbar = () => {
     else {
       // console.log(password)
       setLoginLoading(true)
-      let result = await fetch("https://organ-shield-backend.vercel.app/user/login", {
+      let result = await fetch("", {
         method: "POST",
         body: JSON.stringify({
           "email": email,
