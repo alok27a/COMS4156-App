@@ -9,155 +9,30 @@ To distinguish from regular event-management services and make it useful for eld
 Link to the backend repository is [Click Here](https://github.com/COMS4156-Eventease/COMS4156-Project)
 
 ## Technologies Used
-- **Spring Boot**: 
-- **Spring MVC**: For structuring the application with the MVC pattern.
-- **MySQL**: As the relational database for data storage.
+- **Javascript**: 
+- **React.js**: Framework for frontend development.
 - **Postman**: To test various endpoints provided by our service.
-- **Google Cloud Platform**: For hosting the database and service in the cloud environment.
 
-## Installation 
+## Installation of Client App
+Open the terminal in the folder in which you wish to clone the repository and enter the following command:
+
+```
+git clone https://github.com/alok27a/COMS4156-App
+cd COMS4156-App
+```
+Install all the NPM packages:
+```
+npm i
+```
+
+In order to run the frontend:
+```
+npm run start
+```
 
 ### Prerequisite
-- **Java 17**
-- **Maven**
-- **Spring Boot 3.3.4**
-- **Ubuntu 24**
+- **Node** Better to have the latest version
   
-### Installing the Repository
-Open the terminal in the folder in which you wish to clone the repository and enter the following command:
-```
-git clone https://github.com/COMS4156-Eventease/COMS4156-Project.git
-cd COMS4156-Project
-```
-### Building and running a local instance
-
-The instructions below are for Ubuntu 24.04, however they should be the same for all platforms supported by Java and MySQL.
-To build and run the service, install the following:
-
-- **Maven 3.9.5**: [Download Maven](https://maven.apache.org/download.cgi) and follow the installation steps. Ensure the `bin` directory is added to your system's path.
-- **JDK 17**: [Download JDK 17](https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html), as it is the recommended version for this project.
-- **MySQL 8.0**: [Download MySQL](https://dev.mysql.com/downloads/mysql/) and follow the installation steps. Ensure the `bin` directory is added to your system's path.
-- **IntelliJ IDE**: [Download IntelliJ](https://www.jetbrains.com/idea/download/?section=windows) or use any IDE you prefer.
-
-
-### Changes to be done before starting the Springboot application
-
-#### Set up .env file
-This project requires a `.env` file to store sensitive configuration details such as API credentials, database connection strings, and cloud service credentials. Follow the steps below to set up the `.env` file:
-
-### 1. Create the `.env` File
-
-1. In the root directory of the project, create a file named `.env`.
-2. Add the following environment variables to the `.env` file:
-
-   ```plaintext
-   # Twilio Configuration
-   TWILIO_ACCOUNT_SID=your_twilio_account_sid
-   TWILIO_AUTH_TOKEN=your_twilio_auth_token
-   TWILIO_PHONE_NUMBER=your_twilio_phone_number
-
-   # Database Configuration
-   DB_URL=jdbc:mysql://<your-database-host>:<your-database-port>/<your-database-name>
-   DB_USERNAME=your_database_username
-   DB_PASSWORD=your_database_password
-
-   # GCP Credentials
-   GCP_CREDENTIALS={"type": "service_account","project_id": "<your-project-id>","private_key_id": "<your-private-key-id>","private_key": "-----BEGIN PRIVATE KEY-----\n<your-private-key>\n-----END PRIVATE KEY-----\n","client_email": "<your-client-email>","client_id": "<your-client-id>","auth_uri": "https://accounts.google.com/o/oauth2/auth","token_uri": "https://oauth2.googleapis.com/token","auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs","client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/<your-client-email>"}
-
-### Running the application
-
-To run the application, use:
-```bash
-mvn spring-boot:run 
-```
-
-To make sure the application works, try navigating to http://localhost:8080/test.
-
-## Cloud Application Deployment
-
-The application is currently deployed on Google Cloud Platform (GCP) using App Engine at https://eventease-439518.ue.r.appspot.com/.
-
-### Prerequisites
-1. **Google Cloud SDK**: Install and set up [Google Cloud SDK](https://cloud.google.com/sdk/docs/install).
-2. **GCP Project**: Create a GCP project set up the connection to the GCP project in the project folder 
-
-### Step 1: Create an `app.yaml` File
-In the root folder of the project, create an `app.yaml` file, which configures GCP App Engine environment.
-
-Below is a sample  `app.yaml` template:
-```yaml
-runtime: java17
-instance_class: F2  # Choose an instance class based on your requirements
-automatic_scaling:
-  min_instances: 1
-  max_instances: 2
-env_variables:
-  SPRING_DATASOURCE_URL: <YOUR_DATABASE_URL>
-  SPRING_DATASOURCE_USERNAME: <YOUR_DATABASE_USERNAME>
-  SPRING_DATASOURCE_PASSWORD: <YOUR_DATABASE_PASSWORD>
-  TWILIO_ACCOUNT_SID: <your_twilio_account_sid>
-  TWILIO_AUTH_TOKEN: <your_twilio_auth_token>
-  TWILIO_PHONE_NUMBER: <your_twilio_phone_number>
-  GCP_CREDENTIALS: | 
-    {
-      "type": "service_account",
-      "project_id": "<your-project-id>",
-      "private_key_id": "<your-private-key-id>",
-      "private_key": "-----BEGIN PRIVATE KEY-----\n<your-private-key>\n-----END PRIVATE KEY-----\n",
-      "client_email": "<your-client-email>",
-      "client_id": "<your-client-id>",
-      "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-      "token_uri": "https://oauth2.googleapis.com/token",
-      "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-      "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/<your-client-email>"
-    }
-
-```
-### Step 2: Build the project using Maven
-```bash
-mvn clean package
-```
-
-### Step 3: Deploy to the GCP App Engine
-```bash
-gcloud app deploy
-```
-
-## Creating a test coverage report and code style check
-Generate test coverage report:
-```bash
-mvn jacoco:report
-```
-
-Currently, the branch coverage sits at 61%:
-![image](https://github.com/user-attachments/assets/02905c92-01c0-43b1-8c5b-a6424ca00a8b)
-
-
-Run code style checks:
-```
-mvn checkstyle:check
-```
-
-Currently there are no style reports:
-![image](https://github.com/user-attachments/assets/1a22e18a-5186-41fa-bd20-a812f0b7296c)
-
-
-
-## Automated CI/CD Pipeline
-
-This project has an automatic CI/CD pipeline set up using GitHub Actions. The pipeline is triggered on every commit and pull request across the repository.
-
-The pipeline does the following:
-- Compile the Java application
-- Run unit tests using `mvn test`
-- Runs and publishes a JaCoCo test coverage report as an artifact
-- Checks code style using Checkstyle
-
-
-## Development lifecycle
-
-For every new feature, a new branch should be created. Once that branch is ready to be merged, at least one other maintainer will need to approve it before it is able to be merged. 
-
 
 ## Endpoint Documentation 
 
