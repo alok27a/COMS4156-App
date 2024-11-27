@@ -14,17 +14,20 @@ import {
 import Card from "../../components/Utility/Card";
 import Sidebar from "../../components/Caregiver/CaregiverSidebar";
 import axios from "axios"; // Ensure axios is installed
+import { useParams } from "react-router-dom";
+
 
 const CaregiverAssignedTasks = () => {
     const toast = useToast();
     const [tasks, setTasks] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
-    const userId = 1; // Replace with dynamic user ID if needed
-
+    // const userId = 1; // Replace with dynamic user ID if needed
+    const { userId } = useParams();
     // Fetch assigned tasks from API
     useEffect(() => {
         const fetchTasks = async () => {
             try {
+                // console.log(userId)
                 const response = await axios.get(
                     `https://eventease-439518.ue.r.appspot.com/api/tasks/user/${userId}`
                 );
@@ -36,6 +39,8 @@ const CaregiverAssignedTasks = () => {
                         description: task.description,
                         status: task.status,
                     }));
+
+                    console.log(response.data)
                     setTasks(transformedTasks);
                 } else {
                     toast({

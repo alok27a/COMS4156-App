@@ -30,6 +30,7 @@ import {
 import Card from "../../components/Utility/Card";
 import Sidebar from "../../components/Caregiver/CaregiverSidebar";
 import { useParams } from "react-router-dom";
+import { useDisclosure } from "@chakra-ui/react";
 
 const CaregiverRegisteredEvents = () => {
   const { userId } = useParams();
@@ -46,6 +47,23 @@ const CaregiverRegisteredEvents = () => {
     description: "",
     photoUrl: "",
   });
+  const [isRSVPModalOpen, setRSVPModalOpen] = useState(false);
+  const [rsvpMethod, setRsvpMethod] = useState("");
+  const [rsvpData, setRsvpData] = useState({
+    userId: "",
+    message: "",
+    subject: "",
+  });
+  const [currentEventId, setCurrentEventId] = useState(null);
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [assignTaskData, setAssignTaskData] = useState({
+    userId: "",
+    task: {
+      name: "",
+      description: "",
+      status: "PENDING",
+    },
+  });
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -54,7 +72,6 @@ const CaregiverRegisteredEvents = () => {
           "https://eventease-439518.ue.r.appspot.com/api/events/all"
         );
         const data = await response.json();
-
         if (response.ok && data.data) {
           setRegisteredEvents(data.data);
         } else {
@@ -70,19 +87,15 @@ const CaregiverRegisteredEvents = () => {
         });
       }
     };
-
     fetchEvents();
   }, [toast]);
 
   const handleViewDetails = async (eventId) => {
     try {
-      // Fetch attendees
       const attendeesResponse = await fetch(
         `https://eventease-439518.ue.r.appspot.com/api/events/${eventId}/attendees`
       );
       const attendeesData = await attendeesResponse.json();
-
-      // Fetch tasks
       const tasksResponse = await fetch(
         `https://eventease-439518.ue.r.appspot.com/api/tasks/event/${eventId}`
       );
@@ -93,13 +106,11 @@ const CaregiverRegisteredEvents = () => {
       } else {
         throw new Error(attendeesData.message || "Failed to fetch attendees.");
       }
-
       if (tasksResponse.ok && tasksData.data) {
         setTasks(tasksData.data);
       } else {
         throw new Error(tasksData.message || "Failed to fetch tasks.");
       }
-
       setAttendeeModalOpen(true);
     } catch (error) {
       toast({
@@ -134,7 +145,6 @@ const CaregiverRegisteredEvents = () => {
           body: JSON.stringify(editFormData),
         }
       );
-
       if (response.ok) {
         toast({
           title: "Event Updated",
@@ -143,7 +153,6 @@ const CaregiverRegisteredEvents = () => {
           duration: 5000,
           isClosable: true,
         });
-
         setRegisteredEvents((prevEvents) =>
           prevEvents.map((event) =>
             event.id === selectedEvent.id
@@ -151,7 +160,6 @@ const CaregiverRegisteredEvents = () => {
               : event
           )
         );
-
         setEditModalOpen(false);
       } else {
         throw new Error("Failed to update event.");
@@ -171,9 +179,10 @@ const CaregiverRegisteredEvents = () => {
     try {
       const response = await fetch(
         `https://cors-anywhere.herokuapp.com/https://eventease-439518.ue.r.appspot.com/api/events/${eventId}`,
-        { method: "DELETE" }
+        {
+          method: "DELETE",
+        }
       );
-
       if (response.ok) {
         toast({
           title: "Event Deleted",
@@ -182,7 +191,6 @@ const CaregiverRegisteredEvents = () => {
           duration: 5000,
           isClosable: true,
         });
-
         setRegisteredEvents((prevEvents) =>
           prevEvents.filter((event) => event.id !== eventId)
         );
@@ -200,67 +208,30 @@ const CaregiverRegisteredEvents = () => {
     }
   };
 
-  const handleAssignTasks = async (eventId) => {
-    try {
-      const response = await fetch(
-        `https://cors-anywhere.herokuapp.com/https://eventease-439518.ue.r.appspot.com/api/tasks?eventId=${eventId}&userId=${userId}`,
-        { method: "POST" }
-      );
-
-      if (response.ok) {
-        toast({
-          title: "Tasks Assigned",
-          description: "Tasks were successfully assigned.",
-          status: "success",
-          duration: 5000,
-          isClosable: true,
-        });
-      } else {
-        throw new Error("Failed to assign tasks.");
-      }
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: error.message,
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-      });
-    }
-  };
-
-  // RSVP a user button
-  const [isRSVPModalOpen, setRSVPModalOpen] = useState(false);
-  const [rsvpMethod, setRsvpMethod] = useState(""); // "SMS" or "Email"
-  const [rsvpData, setRsvpData] = useState({
-    userId: "",
-    message: "",
-    subject: "",
-  });
-  const [currentEventId, setCurrentEventId] = useState(null); // To store eventId
-  
   const handleRSVPUser = (eventId) => {
-    setCurrentEventId(eventId); // Set the eventId
+    setCurrentEventId(eventId);
     setRSVPModalOpen(true);
   };
-  
+
   const handleRSVPSubmit = async () => {
     try {
       const url =
         rsvpMethod === "SMS"
           ? "https://cors-anywhere.herokuapp.com/https://eventease-439518.ue.r.appspot.com/api/send-message"
           : "https://cors-anywhere.herokuapp.com/https://eventease-439518.ue.r.appspot.com/api/send-email";
-  
       const payload =
         rsvpMethod === "SMS"
-          ? { eventId: currentEventId.toString(), userId: rsvpData.userId, message: rsvpData.message }
+          ? {
+              eventId: currentEventId.toString(),
+              userId: rsvpData.userId,
+              message: rsvpData.message,
+            }
           : {
               eventId: currentEventId.toString(),
               userId: rsvpData.userId,
               subject: rsvpData.subject,
               message: rsvpData.message,
             };
-  
       const response = await fetch(url, {
         method: "POST",
         headers: {
@@ -268,7 +239,6 @@ const CaregiverRegisteredEvents = () => {
         },
         body: JSON.stringify(payload),
       });
-  
       if (response.ok) {
         toast({
           title: "RSVP Sent",
@@ -279,7 +249,7 @@ const CaregiverRegisteredEvents = () => {
         });
         setRSVPModalOpen(false);
         setRsvpData({ userId: "", message: "", subject: "" });
-        setCurrentEventId(null); // Clear eventId after use
+        setCurrentEventId(null);
       } else {
         throw new Error("Failed to send RSVP.");
       }
@@ -293,7 +263,69 @@ const CaregiverRegisteredEvents = () => {
       });
     }
   };
-  
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    if (name.startsWith("task.")) {
+      setAssignTaskData((prevData) => ({
+        ...prevData,
+        task: {
+          ...prevData.task,
+          [name.split(".")[1]]: value,
+        },
+      }));
+    } else {
+      setAssignTaskData((prevData) => ({
+        ...prevData,
+        [name]: value,
+      }));
+    }
+  };
+
+  const handleSubmitTask = async (eventId) => {
+    if (!eventId) {
+      toast({
+        title: "Error",
+        description: "Event ID is required to assign a task.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+      return;
+    }
+    try {
+      const response = await fetch(
+        `https://cors-anywhere.herokuapp.com/https://eventease-439518.ue.r.appspot.com/api/tasks?userId=${assignTaskData.userId}&eventId=${eventId}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(assignTaskData),
+        }
+      );
+      if (response.ok) {
+        toast({
+          title: "Task Assigned",
+          description: "The task was successfully assigned.",
+          status: "success",
+          duration: 5000,
+          isClosable: true,
+        });
+        onClose();
+      } else {
+        throw new Error("Failed to assign task.");
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error.message,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+  };
 
   const filteredEvents = registeredEvents.filter((event) =>
     event.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -315,9 +347,7 @@ const CaregiverRegisteredEvents = () => {
             />
           </Stack>
         </Card>
-
         <Box>
-          {/* Section for Events with Buttons */}
           <Heading size="lg" mb={4} textAlign="center">
             My Events
           </Heading>
@@ -380,12 +410,15 @@ const CaregiverRegisteredEvents = () => {
                           View Details
                         </Button>
                         <Button
-                          colorScheme="green"
-                          onClick={() => handleAssignTasks(event.id)}
+                          colorScheme="blue"
+                          mr={3}
+                          onClick={() => {
+                            setSelectedEvent(event);
+                            onOpen();
+                          }}
                         >
-                          Assign Tasks
+                          Assign Task
                         </Button>
-
                         <Button
                           colorScheme="blue"
                           onClick={() => handleRSVPUser(event.id)}
@@ -398,8 +431,6 @@ const CaregiverRegisteredEvents = () => {
                 </GridItem>
               ))}
           </Grid>
-
-          {/* Section for Events Without Buttons */}
           <Heading size="lg" mt={8} mb={4} textAlign="center">
             Other Events
           </Heading>
@@ -446,10 +477,9 @@ const CaregiverRegisteredEvents = () => {
                   </Card>
                 </GridItem>
               ))}
-          </Grid>
-        </Box>
+          </Grid>{" "}
+        </Box>{" "}
       </Stack>
-
       {/* Attendee Modal */}
       <Modal
         isOpen={isAttendeeModalOpen}
@@ -483,7 +513,6 @@ const CaregiverRegisteredEvents = () => {
                 ))}
               </Tbody>
             </Table>
-
             <Heading size="md" mt={6} mb={4}>
               Assigned Tasks
             </Heading>
@@ -542,15 +571,6 @@ const CaregiverRegisteredEvents = () => {
                 }
               />
             </FormControl>
-            <FormControl>
-              <FormLabel>Photo URL</FormLabel>
-              <Input
-                value={editFormData.photoUrl}
-                onChange={(e) =>
-                  setEditFormData({ ...editFormData, photoUrl: e.target.value })
-                }
-              />
-            </FormControl>
           </ModalBody>
           <ModalFooter>
             <Button colorScheme="blue" onClick={saveEditedEvent}>
@@ -563,6 +583,7 @@ const CaregiverRegisteredEvents = () => {
         </ModalContent>
       </Modal>
 
+      {/* RSVP Modal */}
       <Modal isOpen={isRSVPModalOpen} onClose={() => setRSVPModalOpen(false)}>
         <ModalOverlay />
         <ModalContent>
@@ -651,8 +672,57 @@ const CaregiverRegisteredEvents = () => {
           </ModalFooter>
         </ModalContent>
       </Modal>
+
+      {/* Assign Task Modal */}
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Assign Task</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <FormControl mb={4}>
+              <FormLabel>User ID</FormLabel>
+              <Input
+                name="userId"
+                value={assignTaskData.userId}
+                onChange={handleInputChange}
+                placeholder="Enter User ID"
+              />
+            </FormControl>
+            <FormControl mb={4}>
+              <FormLabel>Task Name</FormLabel>
+              <Input
+                name="task.name"
+                value={assignTaskData.task.name}
+                onChange={handleInputChange}
+                placeholder="Enter Task Name"
+              />
+            </FormControl>
+            <FormControl mb={4}>
+              <FormLabel>Description</FormLabel>
+              <Textarea
+                name="task.description"
+                value={assignTaskData.task.description}
+                onChange={handleInputChange}
+                placeholder="Enter Task Description"
+              />
+            </FormControl>
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              colorScheme="blue"
+              mr={3}
+              onClick={() => handleSubmitTask(selectedEvent.id)}
+            >
+              Assign Task
+            </Button>
+            <Button variant="ghost" onClick={onClose}>
+              Cancel
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </Sidebar>
   );
 };
-
 export default CaregiverRegisteredEvents;
