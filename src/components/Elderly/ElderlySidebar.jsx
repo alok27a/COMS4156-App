@@ -11,25 +11,27 @@ import {
   useDisclosure,
   Heading,
 } from "@chakra-ui/react";
-import { FaHome, FaHistory, FaCcVisa, FaKey,FaBookReader } from "react-icons/fa";
-import logo from '../../assets/profile.png'
-
+import { FaHome, FaHistory, FaCcVisa, FaKey, FaBookReader } from "react-icons/fa";
+import logo from "../../assets/profile.png";
 import { HamburgerIcon } from "@chakra-ui/icons";
-import { NavLink } from "react-router-dom";
-
-const LinkItems = [
-  { name: "Home", icon: FaHome, path: "/elderly/dashboard" },
-  { name: "Registered Events", icon:FaBookReader , path: "/elderly/dashboard/registeredevents" },
-  { name: "History", icon: FaHistory, path: "/donor/dashboard/history" },
-];
+import { NavLink, useParams } from "react-router-dom";
 
 const SidebarContent = ({ onClose, ...rest }) => {
+  const { userId } = useParams(); // Get userId from URL parameters
+
+  // Dynamically generate LinkItems with userId
+  const LinkItems = [
+    { name: "Home", icon: FaHome, path: `/elderly/${userId}/dashboard` },
+    { name: "Registered Events", icon: FaBookReader, path: `/elderly/${userId}/dashboard/registeredevents` },
+    // { name: "History", icon: FaHistory, path: `/elderly/${userId}/dashboard/history` },
+  ];
+
   return (
     <Box bg="white" w={{ base: "full", md: 60 }} pos="fixed" h="full" {...rest}>
       <Flex h="20" alignItems="center" mx="8" justifyContent="space-between">
-        <Flex alignItems="center" gap={2}>  
+        <Flex alignItems="center" gap={2}>
           <Link as={NavLink} to="/" mb={2}>
-            <img src={logo}  width="80%"/>
+            <img src={logo} width="80%" />
           </Link>
         </Flex>
         <CloseButton display={{ base: "flex", md: "none" }} onClick={onClose} />
@@ -116,10 +118,11 @@ const MobileNav = ({ onOpen, ...rest }) => {
 
 const Sidebar = ({ children }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
+
   return (
     <Box minH="100vh" bg="blue.50">
       <SidebarContent
-        onClose={() => onClose}
+        onClose={onClose}
         display={{ base: "none", md: "block" }}
       />
       <Drawer

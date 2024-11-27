@@ -1,5 +1,4 @@
 import React from "react";
-
 import {
   Stack,
   Heading,
@@ -8,13 +7,8 @@ import {
   Image,
   Flex,
   Box,
-  Link,
   useDisclosure,
   useToast,
-  toast,
-  Textarea,
-  useClipboard,
-  Select,
   Text
 } from "@chakra-ui/react";
 
@@ -23,8 +17,7 @@ import {
   FormLabel,
   Input,
   InputGroup,
-  FormErrorMessage,
-  FormHelperText,
+  InputRightElement
 } from '@chakra-ui/react'
 
 import {
@@ -35,50 +28,30 @@ import {
   ModalFooter,
   ModalBody,
   ModalCloseButton,
-  InputRightElement
 } from '@chakra-ui/react'
-import { CopyIcon } from '@chakra-ui/icons'
+
 import { useNavigate } from "react-router-dom";
 
 import Security from "../assets/elderly.jpg";
 
 const Hero = () => {
   const toast = useToast()
-
   const [show, setShow] = React.useState(false)
-  const [show1, setShow1] = React.useState(false)
-  const [token, setToken] = React.useState(false);
-
-  // SIGN UP DETAILS
-  const [name, setName] = React.useState("")
-  const [email, setEmail] = React.useState("")
-  const [password, setPassword] = React.useState("")
-  const [blood, setBlood] = React.useState("")
-  const [categ, setCateg] = React.useState("")
-  const [address, setAddress] = React.useState("")
-  const [age, setAge] = React.useState("")
-  const [gender, setGender] = React.useState("")
-
-
-  let [value, setValue] = React.useState('')
-  const { onCopy, hasCopied } = useClipboard(value);
-  const [registerLoading, setRegisterLoading] = React.useState(false)
-
-
   const { isOpen, onOpen, onClose } = useDisclosure()
 
-  const initialRef = React.useRef(null)
-  const finalRef = React.useRef(null)
+  // SIGN UP DETAILS
+  const [firstName, setFirstName] = React.useState("")
+  const [lastName, setLastName] = React.useState("")
+  const [username, setUsername] = React.useState("")
+  const [password, setPassword] = React.useState("")
+  const [email, setEmail] = React.useState("")
+  const [phoneNumber, setPhoneNumber] = React.useState("")
+  const [registerLoading, setRegisterLoading] = React.useState(false)
 
   const handleClick = () => setShow(!show)
 
-  let handleInputChange = (e) => {
-    let inputValue = e.target.value
-    setValue(inputValue)
-  }
-
   const signupUser = async () => {
-    if (categ == null || name == null || email == null || password == null || blood == null || address == null || age == null || gender == null) {
+    if (!firstName || !lastName || !username || !password || !email || !phoneNumber) {
       toast({
         title: 'Error!',
         description: "Missing Fields",
@@ -86,52 +59,51 @@ const Hero = () => {
         duration: 9000,
         isClosable: true,
       })
-    }
-    else {
+    } else {
       setRegisterLoading(true)
-      let result = await fetch("https://organ-shield-backend.vercel.app/user/create", {
-        method: "POST",
-        body: JSON.stringify({
-          "name": name,
-          "email": email,
-          "password": password,
-          "blood_group": blood,
-          "type": categ,
-          "address": address,
-          "age": age,
-          "gender": gender
-        }),
-        headers: {
-          "Content-Type": "application/json",
-          'Accept': 'application/json',
-          "Access-Control-Allow-Origin": "*"
-        }
-      })
-      setRegisterLoading(false)
-      let test = await result.json()
-      console.log(test)
-      if (test.success) {
-        console.log("result", test)
-        toast({
-          title: 'Success!',
-          description: test.message,
-          status: 'success',
-          duration: 9000,
-          isClosable: true,
+      try {
+        let result = await fetch("https://cors-anywhere.herokuapp.com/https://eventease-439518.ue.r.appspot.com/api/users/add", {
+          method: "POST",
+          body: JSON.stringify({
+            id:999,
+            firstName,
+            lastName,
+            username,
+            password,
+            email,
+            phoneNumber,
+            role: "ELDERLY"
+          }),
+          headers: {
+            "Content-Type": "application/json",
+            'Accept': 'application/json',
+          }
         })
-      }
-      else {
+        let response = await result.json()
+        if (response.success) {
+          toast({
+            title: 'Success!',
+            description: response.message,
+            status: 'success',
+            duration: 9000,
+            isClosable: true,
+          })
+        } else {
+          throw new Error(response.message)
+        }
+      } catch (error) {
         toast({
           title: 'Error!',
-          description: test.message,
+          description: error.message,
           status: 'error',
           duration: 9000,
           isClosable: true,
         })
+      } finally {
+        setRegisterLoading(false)
       }
     }
   }
-
 
   return (
     <Container maxW="container.xl" bg="">
@@ -147,39 +119,60 @@ const Hero = () => {
               <Button colorScheme="blue" p={4} onClick={onOpen}>
                 Sign Up
               </Button>
-              <Modal
-                initialFocusRef={initialRef}
-                finalFocusRef={finalRef}
-                isOpen={isOpen}
-                onClose={onClose}
-              >
+              <Modal isOpen={isOpen} onClose={onClose}>
                 <ModalOverlay />
                 <ModalContent>
                   <ModalHeader>Create your account</ModalHeader>
                   <ModalCloseButton />
                   <ModalBody pb={6}>
-                    <FormControl mb={5}>
-                      <FormLabel>Enter Name</FormLabel>
+                    <FormControl mb={3}>
+                      <FormLabel>First Name</FormLabel>
                       <Input
-                        placeholder='Enter Here'
-                        value={name}
-                        onChange={(e) => { setName(e.target.value) }}
+                        placeholder='Enter First Name'
+                        value={firstName}
+                        onChange={(e) => setFirstName(e.target.value)}
                       />
-                      <FormLabel>Enter E-Mail ID</FormLabel>
+                    </FormControl>
+                    <FormControl mb={3}>
+                      <FormLabel>Last Name</FormLabel>
                       <Input
-                        placeholder='Enter Here'
+                        placeholder='Enter Last Name'
+                        value={lastName}
+                        onChange={(e) => setLastName(e.target.value)}
+                      />
+                    </FormControl>
+                    <FormControl mb={3}>
+                      <FormLabel>Username</FormLabel>
+                      <Input
+                        placeholder='Enter Username'
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                      />
+                    </FormControl>
+                    <FormControl mb={3}>
+                      <FormLabel>Email</FormLabel>
+                      <Input
+                        placeholder='Enter Email'
                         value={email}
-                        onChange={(e) => { setEmail(e.target.value) }}
+                        onChange={(e) => setEmail(e.target.value)}
                       />
-
+                    </FormControl>
+                    <FormControl mb={3}>
+                      <FormLabel>Phone Number</FormLabel>
+                      <Input
+                        placeholder='Enter Phone Number'
+                        value={phoneNumber}
+                        onChange={(e) => setPhoneNumber(e.target.value)}
+                      />
+                    </FormControl>
+                    <FormControl mb={3}>
                       <FormLabel>Password</FormLabel>
-                      <InputGroup size='md'>
+                      <InputGroup>
                         <Input
-                          value={password}
-                          onChange={(e) => { setPassword(e.target.value) }}
-                          pr='4.5rem'
                           type={show ? 'text' : 'password'}
                           placeholder='Enter password'
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
                         />
                         <InputRightElement width='4.5rem'>
                           <Button h='1.75rem' size='sm' onClick={handleClick}>
@@ -187,26 +180,7 @@ const Hero = () => {
                           </Button>
                         </InputRightElement>
                       </InputGroup>
-
-                
-
-                      <FormLabel>Enter Age</FormLabel>
-                      <Input
-                        placeholder='Enter Here'
-                        value={age}
-                        onChange={(e) => { setAge(e.target.value) }}
-                      />
-                      <FormLabel>Enter Gender</FormLabel>
-                      <Input
-                        placeholder='Enter Here'
-                        value={gender}
-                        onChange={(e) => { setGender(e.target.value) }}
-                      />
-
-
                     </FormControl>
-
-
                   </ModalBody>
 
                   <ModalFooter>
@@ -215,24 +189,6 @@ const Hero = () => {
                     </Button>
                     <Button onClick={onClose}>Cancel</Button>
                   </ModalFooter>
-                  {token && <Box
-                    value={value}
-                    onChange={handleInputChange}
-                    w='100%'
-                    p='5'
-                    color='black'
-                    bg='blue.200'
-                  >
-                    <Text fontSize='xl'>
-                      Please Keep this Encrypted Key Safely!
-                    </Text>
-                    <br></br>
-                    {value}
-                    <br></br>
-                    <Button onClick={onCopy} ml={2} leftIcon={<CopyIcon />} colorScheme='blue'>
-                      {hasCopied ? "Copied" : "Copy"}
-                    </Button>
-                  </Box>}
                 </ModalContent>
               </Modal>
             </Stack>
