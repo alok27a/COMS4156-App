@@ -5,8 +5,8 @@ EventEase is a flexible RESTful service designed to simplify and automate the co
 
 To distinguish from regular event-management services and make it useful for elderly users, Eventease provides SMS and email reminders for events, allowing elderly users to stay informed without relying on complex apps. Additionally, a simple RSVP system could be integrated, enabling one-click RSVP via email or SMS, reducing the need for navigating complicated interfaces. The API would also support caregiver collaboration, allowing caregivers to manage event details, send RSVPs, or receive notifications on behalf of elderly users. Lastly, an option for simplified, large-text invitations or event details could be offered to ensure better accessibility for users with vision impairments or low digital literacy.
 
-## Backend Repository  
-Link to the backend repository is [Click Here](https://github.com/COMS4156-Eventease/COMS4156-Project)
+## Service Repository  
+Link to the service repository is [Click Here](https://github.com/COMS4156-Eventease/COMS4156-Project)
 
 ## Technologies Used
 - **Javascript**: 
@@ -32,7 +32,12 @@ npm run start
 
 ### Prerequisite
 - **Node** Better to have the latest version
-  
+
+### To Run Unit Tests of Client App
+Execute the below code in the client app folder
+```
+npm test
+```
 
 ## Endpoint Documentation 
 
@@ -350,3 +355,29 @@ Here is documentation for all the HTTP endpoints exposed by this application:
 * Upon Failure:
   * HTTP 404 Status Code if the user is not found.
   * HTTP 500 Internal Server Error for other issues.
+
+### Screenshots of the Client App
+
+
+Elderly Dashboard
+![image](https://github.com/user-attachments/assets/9311b11b-63f1-4dcf-89b1-3b458fb7aa47)
+
+Elderly Event's registered 
+![image](https://github.com/user-attachments/assets/a25e41cd-5e66-4851-9bc0-87d80c187f3e)
+
+
+Caregiver Dashboard
+![image](https://github.com/user-attachments/assets/329187c7-03aa-423a-a687-9b27690325c0)
+
+
+Caregiver Creating an Event
+![image](https://github.com/user-attachments/assets/68ee43e2-dacb-4e53-87de-ea2580335d46)
+
+
+Caregiver managing an event 
+![image](https://github.com/user-attachments/assets/7c75537c-8b6f-4d56-af54-8322020313f5)
+
+
+Tasks assigned to a caregiver 
+![image](https://github.com/user-attachments/assets/c068cf05-2f78-4da8-b7ce-be59b375cfa5)
+
