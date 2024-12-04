@@ -24,9 +24,16 @@ const ElderlyRegisteredEvents = () => {
         const fetchRegisteredEvents = async () => {
             try {
                 const response = await fetch(
-                    `https://cors-anywhere.herokuapp.com/https://eventease-439518.ue.r.appspot.com/api/events/rsvp/user/${userId}`
-                );
-
+                    `https://cors-anywhere.herokuapp.com/https://eventease-439518.ue.r.appspot.com/api/events/rsvp/user/${userId}`,
+                    {
+                      method: 'GET',
+                      headers: {
+                        'Origin': 'https://coms-4156-app.vercel.app/',  // Replace with your frontend domain
+                        'X-Requested-With': 'XMLHttpRequest',
+                      }
+                    }
+                  );
+                  
                 if (!response.ok) {
                     throw new Error("Failed to fetch registered events.");
                 }
