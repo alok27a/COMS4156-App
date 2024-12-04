@@ -44,6 +44,7 @@ const Dashboard = () => {
     capacity: "",
     budget: "",
     images: null,
+    endTime: ""
   });
   const [isLoading, setIsLoading] = useState(true);
 
@@ -87,6 +88,7 @@ const Dashboard = () => {
     formData.append("description", newEvent.description);
     formData.append("capacity", newEvent.capacity);
     formData.append("budget", newEvent.budget);
+    formData.append("endTime", newEvent.endTime);
     if (newEvent.images) {
       Array.from(newEvent.images).forEach((image) =>
         formData.append("images", image)
@@ -230,6 +232,19 @@ const Dashboard = () => {
                   }
                 />
               </FormControl>
+
+              <FormControl id="endTime" mt={4} isRequired>
+                <FormLabel>End Time</FormLabel>
+                <ChakraInput
+                  type="time"
+                  placeholder="Enter event time"
+                  value={newEvent.endTime}
+                  onChange={(e) =>
+                    setNewEvent({ ...newEvent, endTime: e.target.value })
+                  }
+                />
+              </FormControl>
+
               <FormControl id="date" mt={4} isRequired>
                 <FormLabel>Date</FormLabel>
                 <ChakraInput
