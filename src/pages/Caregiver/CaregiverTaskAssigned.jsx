@@ -29,7 +29,7 @@ const CaregiverAssignedTasks = () => {
             try {
                 // console.log(userId)
                 const response = await axios.get(
-                    `https://eventease-439518.ue.r.appspot.com/api/tasks/user/${userId}`
+                    `https://cors-anywhere.herokuapp.com/https://eventease-439518.ue.r.appspot.com/api/tasks/user/${userId}`
                 );
                 if (response.data && response.data.success) {
                     // Transform API data into the required format

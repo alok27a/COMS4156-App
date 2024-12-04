@@ -69,7 +69,7 @@ const CaregiverRegisteredEvents = () => {
     const fetchEvents = async () => {
       try {
         const response = await fetch(
-          "https://eventease-439518.ue.r.appspot.com/api/events/all"
+          "https://cors-anywhere.herokuapp.com/https://eventease-439518.ue.r.appspot.com/api/events/all"
         );
         const data = await response.json();
         if (response.ok && data.data) {
@@ -93,11 +93,11 @@ const CaregiverRegisteredEvents = () => {
   const handleViewDetails = async (eventId) => {
     try {
       const attendeesResponse = await fetch(
-        `https://eventease-439518.ue.r.appspot.com/api/events/${eventId}/attendees`
+        `https://cors-anywhere.herokuapp.com/https://eventease-439518.ue.r.appspot.com/api/events/${eventId}/attendees`
       );
       const attendeesData = await attendeesResponse.json();
       const tasksResponse = await fetch(
-        `https://eventease-439518.ue.r.appspot.com/api/tasks/event/${eventId}`
+        `https://cors-anywhere.herokuapp.com/https://eventease-439518.ue.r.appspot.com/api/tasks/event/${eventId}`
       );
       const tasksData = await tasksResponse.json();
 

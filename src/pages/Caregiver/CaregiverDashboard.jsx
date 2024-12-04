@@ -52,7 +52,7 @@ const Dashboard = () => {
     const fetchEvents = async () => {
       try {
         const response = await fetch(
-          "https://eventease-439518.ue.r.appspot.com/api/events/all"
+          "https://cors-anywhere.herokuapp.com/https://eventease-439518.ue.r.appspot.com/api/events/all"
         );
         const data = await response.json();
 
@@ -95,7 +95,7 @@ const Dashboard = () => {
 
     try {
       const response = await fetch(
-        "https://eventease-439518.ue.r.appspot.com/api/events",
+        "https://cors-anywhere.herokuapp.com/https://eventease-439518.ue.r.appspot.com/api/events",
         {
           method: "POST",
           body: formData,
